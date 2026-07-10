@@ -38,3 +38,9 @@ Bullets over prose for multi-part changes. Wrap at 72 characters.
 
     - LiteLLM proxy via docker compose with three model aliases
     - blocking hooks for comment discipline and single-package structure
+
+### Staging
+- At the end of each task, stage the files you created or modified: `git add <path>...`, listing paths explicitly.
+- Never `git add -A`, `git add .`, or `git add -u` — staging sweeps up files you didn't touch, including untracked strays.
+- Never stage files you didn't change as part of the task; never unstage someone else's staged work.
+- Staging is the hand-off: the human reviews `git diff --staged` as one changelist. Committing still requires explicit approval; pushing is always human.
