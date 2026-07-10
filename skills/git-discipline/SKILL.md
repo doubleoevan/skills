@@ -40,7 +40,16 @@ Bullets over prose for multi-part changes. Wrap at 72 characters.
     - blocking hooks for comment discipline and single-package structure
 
 ### Staging
-- At the end of each task, stage the files you created or modified: `git add <path>...`, listing paths explicitly.
-- Never `git add -A`, `git add .`, or `git add -u` — staging sweeps up files you didn't touch, including untracked strays.
-- Never stage files you didn't change as part of the task; never unstage someone else's staged work.
-- Staging is the hand-off: the human reviews `git diff --staged` as one changelist. Committing still requires explicit approval; pushing is always human.
+
+Stage every file as soon as you finish changing it: `git add <path>`, explicit
+paths only. Staging needs no approval and no announcement; it is the hand-off.
+
+- Stage after each change, not at the end of the session. An unstaged fix is
+  invisible to `git diff --staged` review and will drift out of the commit.
+- Re-stage a file every time you touch it again; the index must always match
+  the work you consider done.
+- Never `git add -A`, `git add .`, or `git add -u`: bulk staging sweeps in
+  files you did not touch, including untracked strays.
+- Never stage files you did not change; never unstage work you did not stage.
+- The human reviews `git diff --staged` as one changelist. Commits still
+  require explicit approval; pushing is always human.
