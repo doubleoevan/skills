@@ -12,7 +12,7 @@ description: >
 ### Commits require approval
 
 Ask before running `git commit`. "Go ahead" at session start pre-approves
-commits for that session. NEVER push; pushing is always manual and human.
+commits for that session. NEVER push unless explicitly asked to; pushing is usually manual and human.
 Before suggesting a commit, review the full diff: the message must describe
 what actually changed, not what was intended.
 
