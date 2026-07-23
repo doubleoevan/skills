@@ -233,8 +233,22 @@ contract: a body edit can't silently change what callers receive, and the
 reader never has to infer. Inline callbacks (event handlers, `.map`
 lambdas) may stay inferred.
 
+Relaxed in `.tsx` and `.jsx` files: components leave the return inferred,
+since an annotation only restates that the thing renders. Hooks and plain
+helpers in those files still declare a return type, because their return
+value is not visible from the signature.
+
     // wrong — the contract lives in the body
     export async function runScan(scan: Scan) { ... }
+
+    // right — the contract lives in the signature
+    export async function runScan(scan: Scan): Promise<ScanResult> { ... }
+
+    // fine in a .tsx file — the component renders, nothing to restate
+    export function FeedItem({ finding }: FeedItemProps) { ... }
+
+    // still typed in a .tsx file — the hook returns a value the reader can't see
+    function useTopicFeed(topicId: TopicId): TopicFeedState { ... }
 
     // right — the contract lives in the signature
     export async function runScan(scan: Scan): Promise<ScanResult> { ... }
