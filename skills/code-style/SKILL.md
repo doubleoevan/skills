@@ -261,7 +261,7 @@ translation step and splits every search.
 - `cadence` → **frequency**
 - `curate` → **review**, the stage's own name
 - `prune` → **filter**
-- `harvest` → **emit**, what an ingester is defined to do
+- `harvest` → **find**, or **return** for what a function hands back
 - `seam` → **boundary**, or just name the thing
 
 **Among equally accurate options, use the common word.** A rare word makes the
