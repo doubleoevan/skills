@@ -4,9 +4,9 @@ description: >
   TypeScript and JavaScript readability rules. Use when writing,
   editing, reviewing, or refactoring ANY TypeScript, JavaScript, or JSX code:
   every new function, every fix, every generated file, even one-line changes.
-  Covers mandatory comment groups, top-down file order, file-count discipline,
-  naming, import paths, early returns, and type modeling. If code is being
-  produced or changed, this skill applies.
+  Covers mandatory comment groups, comment scope, top-down file order,
+  file-count discipline, naming, import paths, early returns, and type modeling.
+  If code is being produced or changed, this skill applies.
 ---
 
 # Code Style
@@ -26,11 +26,8 @@ Every logical group of lines gets a comment on the line above it: a single line 
 - Write short plain sentences, lowercase, for a reader who did not write the code. Two short sentences separated by a period beat one clause-chained line.
 - Never use a semicolon in a comment. Use a colon only right before a short list of literal values ("the source kind: rss, reddit, youtube").
 - No dense parentheticals and no unexplained shorthand. Spell it out: "without time zone", never "(no tz)".
-- Keep the why when it is not obvious from the code. Cut detail, not clarity — one line preferred, never more than two.
-- A comment must be true. Verify it against the code it describes before writing it, and fix it when the code changes.
-- Describe what the group does, not how.
+- Cut detail, not clarity — one line preferred, never more than two.
 - A reader must be able to skim only the comments and understand the full flow of the file.
-- Never record how the code got here. No "every caller", no "this used to", no note on what was tried or ruled out. A comment describes the code as it is now.
 - JSX section comments use `{/* section name */}`.
 
 Self-check before finishing any edit: scan the diff. Any group of two or more
@@ -61,7 +58,37 @@ Wording example:
     // right — two plain sentences
     // the scan status. running until it succeeds or fails, and error holds the failure reason
 
-### 2. Top-down file order
+### 2. A comment earns its place
+
+A comment says what the code is. Cut anything that argues for it, describes
+what it is not, or narrates what happens elsewhere.
+
+- **A comment must be true.** Verify it against the code it describes before writing it, and fix it when the code changes.
+- **Describe what the group does, not how.**
+- **Say what a thing is, not what it isn't.**
+- **Keep the fact, drop the argument.** A clause after "since" or "because" is a fact plus a defence of the fact. Keep the fact.
+- **A comment stops at the file it lives in.** What another module does with the value belongs to that module, which is free to change without anyone coming back here.
+- **Never record how the code got here.** No "every caller", no "this used to", no note on what was tried or ruled out. A comment describes the code as it is now.
+- **Keep a why the code cannot show** — an external system's behaviour, an ordering the compiler will not enforce, an api that destroys its input. State it as a plain sentence beside the fact, never as a defence of it.
+
+Applies to `//`, `/** */`, and `{/* */}` alike.
+
+    // wrong — a fact plus an argument for the fact
+    // only the owner may delete, since the team never owned it
+
+    // right — the fact
+    // only the owner may delete
+
+    // wrong — narrates another module
+    // returns the raw rows, which the feed route then sorts and paginates
+
+    // right — stops at this file
+    // returns the raw rows
+
+    // right — a constraint the code cannot show, stated plainly
+    // the sdk empties the buffer on write
+
+### 3. Top-down file order
 
 The file reads like a newspaper: headline first, details after. The exported
 or public function comes first; helpers follow below it in call order.
@@ -76,20 +103,20 @@ or public function comes first; helpers follow below it in call order.
     function normalizeTitle(raw: string) { ... }
     function scoreArticle(article: Article) { ... }
 
-### 3. Fewest files possible
+### 4. Fewest files possible
 
 - A helper lives in its consumer's file until a **third** consumer appears. Extract on the third, not the second.
 - No barrel files (`index.ts` re-exports). No one-function-per-file.
 - Growing an existing file beats creating a new one.
 - Creating a new file requires stating why in the change description, and new files only appear in an approved file tree.
 
-### 4. Screen-sized functions
+### 5. Screen-sized functions
 
 A function should fit on one screen, roughly 40 lines. When it grows past
 that, comment groups become the section markers first; split into a helper
 only when the groups stop fitting, and split **within the same file**.
 
-### 5. Early returns, nesting cap of 2
+### 6. Early returns, nesting cap of 2
 
 Handle failure and edge cases first with guard clauses, then write the happy
 path flat. More than two levels of nesting means restructure.
@@ -115,7 +142,7 @@ path flat. More than two levels of nesting means restructure.
     }
     return renderFeed(subscription)
 
-### 6. Named intermediates over clever chains
+### 7. Named intermediates over clever chains
 
 No chained pipeline past two steps, no nested ternaries, no dense
 destructuring tricks. Each meaningful step gets a named variable, and the
@@ -136,7 +163,7 @@ decodes at 3am.
     // shape for the feed
     const feedItems = topArticles.map(toFeedItem)
 
-### 7. No abbreviations in variable names
+### 8. No abbreviations in variable names
 
 Write the full word, always.
 
@@ -152,13 +179,13 @@ Exceptions that are clearer than the spelled-out version: `url`, `id`, `api`,
 `html`, `css`, `sdk`. Common substitutions: `btn` → `button`, `val` → `value`,
 `cb` → `callback`, `tmp` → a descriptive name for what it actually holds.
 
-### 8. Boolean prefix
+### 9. Boolean prefix
 
 Boolean variables and props are prefixed with `is`, `has`, `can`, `should`,
 or `will`. Examples: `isActive`, `isLoading`, `hasError`, `canSubmit`,
 `shouldRetry`, `willExpire`.
 
-### 9. Meaningful variable names
+### 10. Meaningful variable names
 
 Names describe what the value represents, not its position or freshness.
 `existing`, `latest`, `current`, `result`, `data`, `value`, `item` are not
@@ -172,7 +199,7 @@ self-documenting.
     const existingUser = await db.findUser(id)
     const reportPayload = await response.json()
 
-### 10. JSDoc for exported functions
+### 11. JSDoc for exported functions
 
 Double-star `/** */` block above every exported function. One line only.
 Describe what it does, not how.
@@ -182,7 +209,7 @@ Describe what it does, not how.
      */
     export function scoreArticle(article: Article, profile: ReaderProfile): number { ... }
 
-### 11. Discriminated unions
+### 12. Discriminated unions
 
 When a type has a status or kind field and other fields that only apply to
 certain variants, model each variant as its own union member. Never use
@@ -200,7 +227,7 @@ optional fields to paper over structural differences.
       | { status: 'success'; articles: Article[] }
       | { status: 'failed'; error: unknown }
 
-### 12. Branded types
+### 13. Branded types
 
 Use branded types for semantically distinct strings that TypeScript would
 otherwise treat as interchangeable. Apply the brand at the validation
@@ -214,7 +241,7 @@ Good candidates: entity IDs, validated emails, tokens. Poor candidates:
 strings used immediately in one place and never mixed with other string
 types.
 
-### 13. Alias imports over deep relatives
+### 14. Alias imports over deep relatives
 
 Use the project's path alias (`@/` unless the project defines otherwise) for
 any import that climbs two or more parent directories. Same-folder `./` and a
@@ -227,7 +254,7 @@ specifiers.
     // right — the alias reads as an absolute address
     import { cn } from "@/lib/utils"
 
-### 14. Explicit return types
+### 15. Explicit return types
 
 Every named function declares its return type. The annotation is the
 contract: a body edit can't silently change what callers receive, and the
@@ -245,7 +272,13 @@ value is not visible from the signature.
     // right — the contract lives in the signature
     export async function runScan(scan: Scan): Promise<ScanResult> { ... }
 
-### 15. Ordinary words, and words already here
+    // fine in a .tsx file — the component renders, nothing to restate
+    export function FeedItem({ finding }: FeedItemProps) { ... }
+
+    // still typed in a .tsx file — the hook returns a value the reader can't see
+    function useTopicFeed(topicId: TopicId): TopicFeedState { ... }
+
+### 16. Ordinary words, and words already here
 
 Two checks before naming anything or writing any comment.
 
@@ -283,12 +316,3 @@ substituting.
     // the yearly interval has the higher caps
 
 Applies to comments, test names, and identifiers alike.
-
-    // fine in a .tsx file — the component renders, nothing to restate
-    export function FeedItem({ finding }: FeedItemProps) { ... }
-
-    // still typed in a .tsx file — the hook returns a value the reader can't see
-    function useTopicFeed(topicId: TopicId): TopicFeedState { ... }
-
-    // right — the contract lives in the signature
-    export async function runScan(scan: Scan): Promise<ScanResult> { ... }
