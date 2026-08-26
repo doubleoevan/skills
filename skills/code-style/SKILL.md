@@ -4,16 +4,16 @@ description: >
   TypeScript and JavaScript readability rules. Use when writing,
   editing, reviewing, or refactoring ANY TypeScript, JavaScript, or JSX code:
   every new function, every fix, every generated file, even one-line changes.
-  Covers mandatory comment groups, comment scope, top-down file order,
-  file-count discipline, naming, import paths, early returns, and type modeling.
-  If code is being produced or changed, this skill applies.
+  Covers mandatory comment groups, top-down file order, file-count discipline,
+  naming, import paths, early returns, and type modeling. If code is being
+  produced or changed, this skill applies.
 ---
 
 # Code Style
 
 This codebase is read by one human. Optimize every line for the reader.
 
-Mechanical rules (curly braces, formatting, import order, complexity caps) live
+Mechanical rules (curly braces, formatting, import order, complexity limits) live
 in `biome.json` and CI, not here. This file holds only the judgment rules a
 linter cannot check.
 
@@ -26,8 +26,11 @@ Every logical group of lines gets a comment on the line above it: a single line 
 - Write short plain sentences, lowercase, for a reader who did not write the code. Two short sentences separated by a period beat one clause-chained line.
 - Never use a semicolon in a comment. Use a colon only right before a short list of literal values ("the source kind: rss, reddit, youtube").
 - No dense parentheticals and no unexplained shorthand. Spell it out: "without time zone", never "(no tz)".
-- Cut detail, not clarity — one line preferred, never more than two.
+- Keep the why when it is not obvious from the code. Cut detail, not clarity — one line preferred, never more than two.
+- A comment must be true. Verify it against the code it describes before writing it, and fix it when the code changes.
+- Describe what the group does, not how.
 - A reader must be able to skim only the comments and understand the full flow of the file.
+- Never record how the code got here. No "every caller", no "this used to", no note on what was tried or ruled out. A comment describes the code as it is now.
 - JSX section comments use `{/* section name */}`.
 
 Self-check before finishing any edit: scan the diff. Any group of two or more
@@ -60,33 +63,48 @@ Wording example:
 
 ### 2. A comment earns its place
 
-A comment says what the code is. Cut anything that argues for it, describes
-what it is not, or narrates what happens elsewhere.
+A comment says what the code is. Anything that argues for it, describes what it
+is not, or narrates what happens elsewhere is cut. All three read as filler, and
+all three drift as soon as the code around them moves.
 
-- **A comment must be true.** Verify it against the code it describes before writing it, and fix it when the code changes.
-- **Describe what the group does, not how.**
-- **Say what a thing is, not what it isn't.**
-- **Keep the fact, drop the argument.** A clause after "since" or "because" is a fact plus a defence of the fact. Keep the fact.
-- **A comment stops at the file it lives in.** What another module does with the value belongs to that module, which is free to change without anyone coming back here.
-- **Never record how the code got here.** No "every caller", no "this used to", no note on what was tried or ruled out. A comment describes the code as it is now.
-- **Keep a why the code cannot show** — an external system's behaviour, an ordering the compiler will not enforce, an api that destroys its input. State it as a plain sentence beside the fact, never as a defence of it.
+**The trailing justification.** A factual clause followed by "since" or "because"
+is a fact plus an argument for the fact. Keep the fact.
 
-Applies to `//`, `/** */`, and `{/* */}` alike.
+    // wrong — the clause defends the line above it
+    // only the topic owner may delete, since the team never owned the topic
 
-    // wrong — a fact plus an argument for the fact
-    // only the owner may delete, since the team never owned it
+    // right
+    // only the topic owner may delete
 
-    // right — the fact
-    // only the owner may delete
+**Defining by what it is not.** Say what the thing is.
 
-    // wrong — narrates another module
-    // returns the raw rows, which the feed route then sorts and paginates
+    // wrong
+    // the tooltip is the button's accessible name, since the icon has no text of its own
 
-    // right — stops at this file
-    // returns the raw rows
+    // right
+    // the tooltip is the button's accessible name
 
-    // right — a constraint the code cannot show, stated plainly
-    // the sdk empties the buffer on write
+**Downstream narrative.** A comment stops at the file it lives in. What some
+other module does with the value belongs to that module, which is free to change
+without anyone thinking to come back here.
+
+    // wrong — an api file describing the ui
+    // role and plan are included in the session so the ui can render the admin link
+
+    // right
+    // role and plan are included in the session
+
+Keep a constraint the code cannot show: an external system's behavior, an
+ordering the compiler will not enforce, an api that destroys its input. State it
+as a plain sentence beside the fact, never as a defense of it.
+
+    // wrong — the constraint arrives as an argument
+    // only LISTEN needs the direct connection string, since neon's pooler endpoint
+    // does not deliver notifications to a listener
+
+    // right — two facts, and the second is why the first cannot change
+    // LISTEN needs the direct connection string. neon's pooler drops notifications
+    // to a listener
 
 ### 3. Top-down file order
 
@@ -116,7 +134,7 @@ A function should fit on one screen, roughly 40 lines. When it grows past
 that, comment groups become the section markers first; split into a helper
 only when the groups stop fitting, and split **within the same file**.
 
-### 6. Early returns, nesting cap of 2
+### 6. Early returns, nesting limit of 2
 
 Handle failure and edge cases first with guard clauses, then write the happy
 path flat. More than two levels of nesting means restructure.
@@ -156,7 +174,7 @@ decodes at 3am.
     // keep only articles above the relevance cutoff
     const relevantArticles = articles.filter((article) => article.score > cutoff)
 
-    // rank best-first and cap to the feed size
+    // rank best-first and limit to the feed size
     const rankedArticles = relevantArticles.sort((a, b) => b.score - a.score)
     const topArticles = rankedArticles.slice(0, limit)
 
@@ -309,10 +327,10 @@ reader parse vocabulary instead of reading the sentence.
 Accuracy beats both rules. When the swap changes the meaning, rewrite instead of
 substituting.
 
-    // wrong — "includes" says the caps are contents, not an attribute
-    // the yearly interval includes the higher caps
+    // wrong — "includes" says the limits are contents, not an attribute
+    // the yearly interval includes the higher limits
 
     // right
-    // the yearly interval has the higher caps
+    // the yearly interval has the higher limits
 
 Applies to comments, test names, and identifiers alike.
