@@ -9,6 +9,9 @@ description: >
   weasel words and hedges, plain language and defined terms, narrative
   formats, appendices, and naming owners. Code comments follow code-style.
   Commit messages follow git-discipline.
+metadata:
+  source: https://medium.com/@apappascs/write-like-an-amazonian-14-tips-for-clear-and-persuasive-communication-e2a11afc7362
+  source-author: Alexandros Pappas
 ---
 
 # Write Docs
