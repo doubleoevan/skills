@@ -1,7 +1,7 @@
 # skills
 
-Personal agent skills. Readability-first TypeScript, JavaScript, and JSX
-rules that apply to every project.
+Personal agent skills. Readability-first rules for TypeScript, JavaScript,
+JSX, and docs that apply to every project.
 
 ## Install
 
